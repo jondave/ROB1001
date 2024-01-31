@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 # Written for humble
+
+# this python script subscribes the RGB camera, converts to OpenCV images, converts to HSV, threshhold the image depend on range of colours, draws contours (outline) around selected colours and display the image
+
 # cv2 image types - http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 
 import rclpy
@@ -28,57 +31,41 @@ class ColourContours(Node):
         except CvBridgeError as e:
             print(e)
 
-        # using the BGR colour space, create a mask for everything
-        # that is in a certain range
-        bgr_thresh = cv2.inRange(cv_image,
-                                 np.array((200, 230, 230)),
-                                 np.array((255, 255, 255)))
-
-        # It often is better to use another colour space, that is
-        # less sensitive to illumination (brightness) changes.
-        # The HSV colour space is often a good choice. 
-        # So, we first change the colour space here...
+        # Convert the image to HSV
         hsv_img = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
-        # ... and now let's create a binary (mask) image, looking for 
-        # any hue (range: 0-255), but for something brightly
-        # colours (high saturation: > 150)
+        # Create a binary (mask) image, set the values depedning on the range of colours you are looking for 
+        # HSV (Hue, Saturation, Value)
         hsv_thresh = cv2.inRange(hsv_img,
-                                 np.array((0, 150, 50)),
-                                 np.array((255, 255, 255)))
+                                 np.array((0, 150, 50)), # min values
+                                 np.array((255, 255, 255))) # max values
 
-        # just for the fun of it, print the mean value 
-        # of each HSV channel within the mask 
-        print(cv2.mean(hsv_img[:, :, 0], mask = hsv_thresh)[0])
-        print(cv2.mean(hsv_img[:, :, 1], mask = hsv_thresh)[0])
-        print(cv2.mean(hsv_img[:, :, 2], mask = hsv_thresh)[0])
+        # Print the mean value of each HSV channel within the mask ranges
+        print("Mean hue: " + str(cv2.mean(hsv_img[:, :, 0], mask = hsv_thresh)[0]))
+        print("Mean saturation: " + str(cv2.mean(hsv_img[:, :, 1], mask = hsv_thresh)[0]))
+        print("Mean value: " + str(cv2.mean(hsv_img[:, :, 2], mask = hsv_thresh)[0]))
 
-        # This is how we could find actual contours in
-        # the BGR image, but we won't do this now.
-        # _, bgr_contours, hierachy = cv2.findContours(
-        #     bgr_thresh.copy(),
-        #     cv2.RETR_TREE,
-        #     cv2.CHAIN_APPROX_SIMPLE)
-
-        # Instead find the contours in the mask generated from the
-        # HSV image.
+        # Find the contours in the mask generated from the HSV image
+        # The contours are outline around the shapes in the mask image
         hsv_contours, hierachy = cv2.findContours(
             hsv_thresh.copy(),
             cv2.RETR_TREE,
             cv2.CHAIN_APPROX_SIMPLE)
         
-        # in hsv_contours we now have an array of individual
-        # closed contours (basically a polgon around the 
-        # blobs in the mask). Let's iterate over all those found 
-        # contours.
+        # in hsv_contours there are an array of individual contours (basically a polgon around the blobs in the mask)
         for c in hsv_contours:
             # This allows to compute the area (in pixels) of a contour
             a = cv2.contourArea(c)
-            # and if the area is big enough, we draw the outline
-            # of the contour (in blue)
+            # and if the area is big enough, we draw the outline of the contour on the image
             if a > 100.0:
                 cv2.drawContours(cv_image, c, -1, (255, 0, 0), 3)
+
         print('====')
+
+        # convert the image back to RGB
+        cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+
+        # show the image in the image window
         cv2.imshow("Image window", cv_image)
         cv2.waitKey(1)
 

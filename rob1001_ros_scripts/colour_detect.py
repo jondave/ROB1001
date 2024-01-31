@@ -33,7 +33,7 @@ class ColourDetect(Node):
         #print("Average colour (BGR):", average_colour)
 
         colour_name = self.detect_colour(average_colour)
-        #print("Detected colour:", colour_name)
+        print("Detected colour:", colour_name)
 
         # Publish the detected colour name on the "colour_name" topic
         msg = String()

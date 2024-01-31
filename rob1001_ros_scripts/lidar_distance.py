@@ -2,6 +2,8 @@
 
 # Written for humble
 
+# this python script subscribes to the lidar scan topic, finds the scan with the shortest distance, prints that discatnce to terminal and publishes it as a float on the topic scan_closest
+
 import rclpy
 from rclpy.node import Node
 
@@ -11,7 +13,11 @@ from std_msgs.msg import Float32
 class LidarClosest(Node):
     def __init__(self):
         super().__init__('lidar_closest')
+
+        # Subscribe to the scan topic
         self.subscription = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
+
+        # Create a publisher for float topic
         self.publisher_scan_closest = self.create_publisher(Float32, 'scan_closest', 10)
 
 
@@ -23,7 +29,7 @@ class LidarClosest(Node):
         closest_distance = min(msg.ranges)
 
         # Print the closest distance to the terminal
-        #print('Closest Distance: {}'.format(closest_distance))
+        print('Closest Distance: {}'.format(closest_distance))
 
         # Publish the closest distance on the "scan_closest" topic
         scan_closest_msg = Float32()
@@ -32,7 +38,7 @@ class LidarClosest(Node):
     
 
 def main(args=None):
-    print('Starting colour_detect.py.')
+    print('Starting lidar_distance.py.')
 
     rclpy.init(args=args)
 
