@@ -2,12 +2,13 @@
 
 # Written for humble
 
-# this python script subscribes to the odemetry topic and prints to the terminal and publishes the angular and linear displacement of the robot.
+# this python script subscribes to the odometry topic and prints to the terminal and publishes the position and orientation of the robot.
 
 import rclpy
 from rclpy.node import Node
 
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Pose
 from std_msgs.msg import Float32
 
 class Displacement(Node):
@@ -18,26 +19,29 @@ class Displacement(Node):
         self.subscription = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
 
         # Create publishers for float topics
-        self.linear_displacement_publisher = self.create_publisher(Float32, 'displacement_linear', 10)
-        self.angular_displacement_publisher = self.create_publisher(Float32, 'displacement_angular', 10)
+        self.position_publisher = self.create_publisher(Float32, 'position', 10)
+        self.orientation_publisher = self.create_publisher(Float32, 'orientation', 10)
 
     def odom_callback(self, msg):
+        position_x = msg.pose.pose.position.x
+        position_y = msg.pose.pose.position.y
+        orientation_z = msg.pose.pose.orientation.z
 
-        linear_displacement = msg.twist.twist.linear.x
-        angular_displacement = msg.twist.twist.angular.z
+        # Print position and orientation
+        print("Position (x, y): " + str(position_x) + ", " + str(position_y))
+        print("Orientation (z): " + str(orientation_z))
 
-        # Print displacements
-        print("Linear displacement: " + str(linear_displacement))
-        print("Angular displacement: " + str(angular_displacement))
+        # Publish the position and orientation to the float topics
+        position_msg = Float32()
+        position_msg.data = position_x
+        self.position_publisher.publish(position_msg)
 
-        # Publish the displacements to the float topics
-        linear_displacement_msg = Float32()
-        linear_displacement_msg.data = linear_displacement
-        self.linear_displacement_publisher.publish(linear_displacement_msg)
+        position_msg.data = position_y
+        self.position_publisher.publish(position_msg)
 
-        angular_displacement_msg = Float32()
-        angular_displacement_msg.data = angular_displacement
-        self.angular_displacement_publisher.publish(angular_displacement_msg)
+        orientation_msg = Float32()
+        orientation_msg.data = orientation_z
+        self.orientation_publisher.publish(orientation_msg)
     
 
 def main(args=None):

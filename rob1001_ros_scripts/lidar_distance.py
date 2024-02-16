@@ -25,11 +25,18 @@ class LidarClosest(Node):
         if not msg.ranges:
             return
 
+        # Filter out distances less than or equal to 0
+        valid_ranges = [x for x in msg.ranges if x > 0]
+
+        # If all distances are 0 or less, return
+        if not valid_ranges:
+            return
+
         # Find the closest distance from the laser scan data
-        closest_distance = min(msg.ranges)
+        closest_distance = min(valid_ranges)
 
         # Print the closest distance to the terminal
-        print('Closest Distance: {}'.format(closest_distance))
+        print('Closest Distance (m): {}'.format(closest_distance))
 
         # Publish the closest distance on the "scan_closest" topic
         scan_closest_msg = Float32()

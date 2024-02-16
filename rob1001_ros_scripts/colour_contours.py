@@ -2,7 +2,7 @@
 
 # Written for humble
 
-# this python script subscribes the RGB camera, converts to OpenCV images, converts to HSV, threshhold the image depend on range of colours, draws contours (outline) around selected colours and publishes the image on a new image topic
+# this python script subscribes the RGB camera, converts to OpenCV images, converts to HSV, threshold the image depend on range of colours, draws contours (outline) around selected colours and publishes the image on a new image topic
 
 # cv2 image types - http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
 
@@ -17,7 +17,12 @@ import numpy as np
 class ColourContours(Node):
     def __init__(self):
         super().__init__('colour_contours')
-        self.sub_camera = self.create_subscription(Image, '/limo/depth_camera_link/image_raw', self.camera_callback, 10) # subscribe to the camera colour image topic, the "camera_callback" is the function that is called when new data is recieved on the topic.
+
+        # Subscribe to the camera colour image topic, the "camera_callback" is the function that is called when new data is received on the topic.
+        # Make sure in the subscriber the topic name is correct as they are different for the simulation (/limo/depth_camera_link/image_raw) and real robots (/camera/color/image_raw)
+        self.sub_camera = self.create_subscription(Image, '/camera/color/image_raw', self.camera_callback, 10)
+        
+        # Create the publishers to publish the images from OpenCV
         self.pub_cv_hsv = self.create_publisher(Image, 'open_cv_image/hsv', 10) # publish the hsv image.
         self.pub_cv_thresh = self.create_publisher(Image, 'open_cv_image/hsv_thresh', 10) # publish the threshold image based on the range of colours used.
         self.pub_cv_contours = self.create_publisher(Image, 'open_cv_image/contours', 10) # publish the image with the contours drawn around the coloured objects.
