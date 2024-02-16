@@ -12,46 +12,54 @@ import time
 class MoveSquare(Node):
     def __init__(self):
         super().__init__('move_sqaure')
-        
+
         # Create a publisher for the cmd_vel topic
-        self.robot_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.movement_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.move_in_square()
+        # Create a timer publisher which is run every 0.1 secnods
+        self.timer = self.create_timer(0.1, self.timer_callback)  # 10 Hz
+        self.start_time = time.time()
 
-    def move(self, robot_publisher, linear_x, angular_z, duration):
-        print("Moving at speed X:" + str(linear_x) + " and Z:" + str(angular_z) + " for " + str(duration) + " seconds")
-        msg = Twist()
-        msg.linear.x = linear_x
-        msg.angular.z = angular_z        
+    def timer_callback(self):
+        current_time = time.time()
+        elapsed_time = current_time - self.start_time
 
-        start_time = time.time()
-        while time.time() - start_time < duration:
-            robot_publisher.publish(msg)
+        twist_msg = Twist()
 
-    def move_in_square(self):
-        # Move forward for 10 seconds
-        self.move(self.robot_publisher, linear_x=0.2, angular_z=0.0, duration=10.0)
-        
-        # Turn right for 5 seconds (adjust the angular velocity as needed)
-        self.move(self.robot_publisher, linear_x=0.0, angular_z=-0.4, duration=5.0)
+        if elapsed_time <= 10:  # Move forward at 0.2 m/s for 10 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+            twist_msg.linear.x = 0.2
+            twist_msg.angular.z = 0.0
+        elif elapsed_time <= 15:  # Turn right at 0.4 rad/s for 5 seconds
+            print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = -0.4
+        elif elapsed_time <= 25:  # Move forward at 0.2 m/s for 10 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+            twist_msg.linear.x = 0.2
+            twist_msg.angular.z = 0.0
+        elif elapsed_time <= 30:  # Turn right at 0.4 rad/s for 5 seconds
+            print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = -0.4
+        elif elapsed_time <= 40:  # Move forward at 0.2 m/s for 10 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+            twist_msg.linear.x = 0.2
+            twist_msg.angular.z = 0.0
+        elif elapsed_time <= 45:  # Turn right at 0.4 rad/s for 5 seconds
+            print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = -0.4
+        elif elapsed_time <= 55:  # Move forward at 0.2 m/s for 10 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+            twist_msg.linear.x = 0.2
+            twist_msg.angular.z = 0.0
+        else: # Stop robot
+            print("Robot stopped")
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = 0.0
 
-        # Move forward for 10 seconds
-        self.move(self.robot_publisher, linear_x=0.2, angular_z=0.0, duration=10.0)
-
-        # Turn right for 5 seconds (adjust the angular velocity as needed)
-        self.move(self.robot_publisher, linear_x=0.0, angular_z=-0.4, duration=5.0)
-
-        # Move forward for 10 seconds
-        self.move(self.robot_publisher, linear_x=0.2, angular_z=0.0, duration=10.0)
-
-        # Turn right for 5 seconds (adjust the angular velocity as needed)
-        self.move(self.robot_publisher, linear_x=0.0, angular_z=-0.4, duration=5.0)
-
-        # Move forward for 10 seconds
-        self.move(self.robot_publisher, linear_x=0.2, angular_z=0.0, duration=10.0)
-
-        # Stop the robot
-        self.move(self.robot_publisher, linear_x=0.0, angular_z=0.0, duration=0.1)
+        self.movement_publisher.publish(twist_msg)
 
 def main(args=None):
     print('Starting move_square.py.')
