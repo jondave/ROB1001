@@ -15,9 +15,13 @@ import numpy as np
 class ColourDetect(Node):
     def __init__(self):
         super().__init__('colour_detect')
-        self.sub_camera = self.create_subscription(Image, '/limo/depth_camera_link/image_raw', self.camera_callback, 10)
+
+        # Subscribe to the camera colour image topic, the "camera_callback" is the function that is called when new data is received on the topic.
+        # Make sure in the subscriber the topic name is correct as they are different for the simulation (/limo/depth_camera_link/image_raw) and real robots (/camera/color/image_raw)
+        self.sub_camera = self.create_subscription(Image, '/camera/color/image_raw', self.camera_callback, 10)
         self.sub_camera # prevent unused variable warning
 
+        # Create the publisher to publish the colour name on the topic 'colour_name'
         self.publisher_colour_name = self.create_publisher(String, 'colour_name', 10)  # create publisher for String messages
 
         self.br = CvBridge()

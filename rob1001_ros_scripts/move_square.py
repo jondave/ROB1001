@@ -2,7 +2,7 @@
 
 # Written for humble
 
-# this python script publishes movement commands on the cmd_vel topic to move the robot in a predifined way, here to move in a square forawd for 10 seconds then turn right for 5 seconds
+# this python script publishes movement commands on the cmd_vel topic to move the robot in a predefined way, here to move in a square forward for 5 seconds then turn right for 5 seconds
 
 import rclpy
 from rclpy.node import Node
@@ -16,7 +16,7 @@ class MoveSquare(Node):
         # Create a publisher for the cmd_vel topic
         self.movement_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        # Create a timer publisher which is run every 0.1 secnods
+        # Create a timer publisher which is run every 0.1 seconds
         self.timer = self.create_timer(0.1, self.timer_callback)  # 10 Hz
         self.start_time = time.time()
 
@@ -26,32 +26,32 @@ class MoveSquare(Node):
 
         twist_msg = Twist()
 
-        if elapsed_time <= 10:  # Move forward at 0.2 m/s for 10 seconds
-            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+        if elapsed_time <= 5:  # Move forward at 0.2 m/s for 5 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 5 seconds")
             twist_msg.linear.x = 0.2
             twist_msg.angular.z = 0.0
-        elif elapsed_time <= 15:  # Turn right at 0.4 rad/s for 5 seconds
+        elif elapsed_time <= 10:  # Turn right at 0.4 rad/s for 5 seconds
             print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
             twist_msg.linear.x = 0.0
             twist_msg.angular.z = -0.4
-        elif elapsed_time <= 25:  # Move forward at 0.2 m/s for 10 seconds
-            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+        elif elapsed_time <= 15:  # Move forward at 0.2 m/s for 5 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 5 seconds")
+            twist_msg.linear.x = 0.2
+            twist_msg.angular.z = 0.0
+        elif elapsed_time <= 20:  # Turn right at 0.4 rad/s for 5 seconds
+            print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
+            twist_msg.linear.x = 0.0
+            twist_msg.angular.z = -0.4
+        elif elapsed_time <= 25:  # Move forward at 0.2 m/s for 5 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 5 seconds")
             twist_msg.linear.x = 0.2
             twist_msg.angular.z = 0.0
         elif elapsed_time <= 30:  # Turn right at 0.4 rad/s for 5 seconds
             print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
             twist_msg.linear.x = 0.0
             twist_msg.angular.z = -0.4
-        elif elapsed_time <= 40:  # Move forward at 0.2 m/s for 10 seconds
-            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
-            twist_msg.linear.x = 0.2
-            twist_msg.angular.z = 0.0
-        elif elapsed_time <= 45:  # Turn right at 0.4 rad/s for 5 seconds
-            print("Moving at speed X: 0.0 m/s and Z: 0.4 rad/s for 5 seconds")
-            twist_msg.linear.x = 0.0
-            twist_msg.angular.z = -0.4
-        elif elapsed_time <= 55:  # Move forward at 0.2 m/s for 10 seconds
-            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 10 seconds")
+        elif elapsed_time <= 35:  # Move forward at 0.2 m/s for 5 seconds
+            print("Moving at speed X: 0.2 m/s and Z: 0.0 rad/s for 5 seconds")
             twist_msg.linear.x = 0.2
             twist_msg.angular.z = 0.0
         else: # Stop robot
