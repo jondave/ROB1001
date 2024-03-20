@@ -1,12 +1,9 @@
-; Create global flag variables
+; create global flag variables
 globals [
   turtle_going_to_goal
 ]
 
-
-; Set turtle variables, each turtle has its own set of variables
 turtles-own [
-  go_to_goal
   goal_reached
   at_home
   home_loc
@@ -17,7 +14,7 @@ turtles-own [
 to setup
   clear-all
   reset-ticks
-  set turtle_going_to_goal 0 ; Set the turtle number of the first turtle to move to 0
+  set turtle_going_to_goal 0
 
   ; Create white patches at robot starting points
   ask patch 16 16 [ set pcolor white ]
@@ -25,65 +22,49 @@ to setup
   ask patch -16 16 [ set pcolor white ]
   ask patch -16 -16 [ set pcolor white ]
 
-  ; Create turtles with home locations and variables
   create-turtles 4 [
     set size 2
     set goal_reached false
-    set finished false
-    ; Set starting locations of turtles
-    ask turtle 0 [ setxy 16 16   set home_loc (list 16 16) set heading 225 set color red set go_to_goal true] ; set first turtle go_to_goal true to start process running
-    ask turtle 1 [ setxy 16 -16  set home_loc (list 16 -16) set heading 315 set color green set go_to_goal false]
-    ask turtle 2 [ setxy -16 16  set home_loc (list -16 16) set heading 135 set color blue set go_to_goal false]
-    ask turtle 3 [ setxy -16 -16 set home_loc (list -16 -16) set heading 45  set color orange set go_to_goal false]
-  ]
+    set finished false]
+      ; Set starting locations of turtles
+  ask turtle 0 [ setxy 16 16   set home_loc (list 16 16) set heading 225 set color red]
+  ask turtle 1 [ setxy 16 -16  set home_loc (list 16 -16) set heading 315 set color green]
+  ask turtle 2 [ setxy -16 16  set home_loc (list -16 16) set heading 135 set color blue]
+  ask turtle 3 [ setxy -16 -16 set home_loc (list -16 -16) set heading 45  set color orange]
 
-  ; Create goal patch
+
+  ; draw goal
   ask patch 0 0 [ sprout 1 [ set color yellow set shape "circle" set size 1 stamp die ] ]
 end
 
-; Create a task to delay the turtle moving
 to-report finished_task
-  set count_down count_down + 1 ; Increment delay timer by 1
-  if count_down > 10 [ ; If 10 ticks have passed set that the task has finished
+  set count_down count_down + 1
+  if count_down > 10 [
     set finished true]
   report finished
 end
 
 to go
-  ask turtles [
-    ; If go to goal is true
-    if go_to_goal [
-      ; If distance from turtle to goal is >0.5 and it has not reached the goal, face the goal and move forward
-      ifelse distance (patch 0 0) > 0.5 and not goal_reached [
+  ask turtle turtle_going_to_goal [
+  ifelse distance (patch 0 0) > 0.5 and not goal_reached [
         face patch 0 0
         fd 1
       ]
-      ; If distance from turtle to goal is <0.5 set goal reached to true
       [ set goal_reached true
-        ; If the timer delay task has finished
         if finished_task [
 
-        ; If distance from turtle home > 1 then face home and move forward
         ifelse distance (patch (item 0 home_loc) (item 1 home_loc)) > 1 [
         face patch (item 0 home_loc) (item 1 home_loc)
         fd 1
         ]
-        ; Else distance from turtle home <1 so turtle is at home and set at home flag to true and go to goal to false.
         [ set at_home true
-          set go_to_goal false
-          ; Check is the turtle number that is moving is less than the max 3 (turtle numbers are 0,1,2,3) if so increment by 1 the turtle number that is moving
           if turtle_going_to_goal < 3 [
           set turtle_going_to_goal (turtle_going_to_goal + 1)
           ]
-          ]
-          ; Set the go to goal flag of the next turtle to true to start the next turtle
-          ask turtle turtle_going_to_goal [
-            set go_to_goal true
-          ]
+         ]
         ]
+       ]
       ]
-    ]
-  ]
 end
 
 to run-simulation
